@@ -1,9 +1,0 @@
-*.tmp
-*.log
-
-.vscode/
-.idea/
-
-images/categories/
-images/recipes/
-images/steps/
