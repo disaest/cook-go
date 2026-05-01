@@ -1,0 +1,63 @@
+/*WELCOME*/
+.welcome-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 200px);
+    padding: 40px;
+}
+
+.welcome-image img {
+    max-width: 900px;
+    width: 100%;
+    height: auto;
+}
+
+/*FAVORITES*/
+.favorites-section {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px 40px;
+}
+
+.favorites-header {
+    background: var(--orange);
+    padding: 16px 0;
+    margin: 0 0 32px;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+}
+
+.favorites-header p {
+    color: var(--white);
+    font-size: 32px;
+    font-family: "MPlus";
+    text-align: center;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.favorites-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.no-favorites,
+.login-prompt {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    color: var(--gray);
+    font-size: 22px;
+    font-family: "MPlus";
+}
+
+.login-prompt a {
+    color: var(--orange);
+    text-decoration: none;
+}

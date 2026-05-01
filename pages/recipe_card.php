@@ -1,13 +1,39 @@
 <?php
 session_start();
 require_once '../components/connect.php';
+
 $isLoggedIn = isLoggedIn();
 $userLogin = getUserLogin();
+$userId = $_SESSION['user_id'] ?? 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $rid = (int)($_POST['recipe_id'] ?? 0);
+    $action = $_POST['action'] ?? '';
+    if ($userId && $rid) {
+        if ($action === 'like') {
+            mysqli_query($conn, "INSERT IGNORE INTO user_likes (user_id, recipe_id) VALUES ($userId, $rid)");
+            mysqli_query($conn, "UPDATE recipes SET likes = likes + 1 WHERE id = $rid");
+        } elseif ($action === 'unlike') {
+            mysqli_query($conn, "DELETE FROM user_likes WHERE user_id = $userId AND recipe_id = $rid");
+            mysqli_query($conn, "UPDATE recipes SET likes = GREATEST(likes - 1, 0) WHERE id = $rid");
+        }
+    }
+    exit;
+}
+if (isset($_GET['check_like'])) {
+    $rid = (int)($_GET['check_like'] ?? 0);
+    $liked = false;
+    if ($userId && $rid) {
+        $res = mysqli_query($conn, "SELECT id FROM user_likes WHERE user_id = $userId AND recipe_id = $rid");
+        $liked = mysqli_num_rows($res) > 0;
+    }
+    header('Content-Type: application/json');
+    echo json_encode(['liked' => $liked]);
+    exit;
+}
 
 $recipe_id = $_GET['recipe_id'] ?? 0;
 $category_id = $_GET['category_id'] ?? 0;
 $catTitle = safe(urldecode($_GET['category_title'] ?? 'категория'));
-
 $q = "SELECT * FROM recipes WHERE id = $recipe_id";
 $res = mysqli_query($conn, $q);
 $r = mysqli_fetch_array($res);
@@ -20,16 +46,18 @@ if ($r) {
     $port = safe($r['portions'] ?? 'Не указано');
     $time = safe($r['time_for_cook'] ?? 'Не указано');
     $tut = safe($r['tutorial'] ?? '');
-    
-    // Получаем количество шагов из step_images
-    $stepQ = "SELECT COUNT(*) as cnt FROM step_images WHERE recipe_id = $recipe_id";
-    $stepRes = mysqli_query($conn, $stepQ);
-    $stepRow = mysqli_fetch_array($stepRes);
-    $stepCount = $stepRow['cnt'] ?? 0;
+    $mainImg = '';
+    if (!empty($r['image_data'])) {
+        $mainImg = 'data:' . $r['image_type'] . ';base64,' . base64_encode($r['image_data']);
+    }
+    $stepCountRes = mysqli_query($conn, "SELECT COUNT(*) as cnt FROM step_images WHERE recipe_id = $recipe_id");
+    $stepCountRow = mysqli_fetch_array($stepCountRes);
+    $stepCount = $stepCountRow['cnt'] ?? 0;
 } else {
     $title = 'Рецепт не найден';
     $desc = $ingr = $port = $time = $tut = '';
     $likes = 0;
+    $mainImg = '';
     $stepCount = 0;
 }
 ?>
@@ -39,21 +67,20 @@ if ($r) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title; ?></title>
-    <link rel="stylesheet" href="../components/style.css">
+    <link rel="stylesheet" href="../components/styles/base.css">
+    <link rel="stylesheet" href="../components/styles/recipe_card.css">
     <script src="../components/header.js" defer></script>
     <script src="../components/footer.js" defer></script>
 </head>
 <body data-logged-in="<?php echo $isLoggedIn ? 'true' : 'false'; ?>" data-user-login="<?php echo safe($userLogin); ?>">
     <my-header title="<?php echo $title; ?>" link-text="<?php echo $catTitle; ?>" link-url="recipes.php?category_id=<?php echo $category_id; ?>"></my-header>
-
     <main>
         <div class="recipe-detail-container">
             <?php if ($r): ?>
                 <div class="recipe-card-full">
                     <div class="recipe-main-image">
-                        <img src="image.php?id=<?php echo $recipe_id; ?>" alt="<?php echo $title; ?>">
+                        <img src="<?php echo $mainImg; ?>" alt="<?php echo $title; ?>">
                     </div>
-
                     <div class="recipe-header-row">
                         <div class="recipe-text-content">
                             <h1 class="recipe-title-full"><?php echo $title; ?></h1>
@@ -66,7 +93,6 @@ if ($r) {
                             </button>
                         </div>
                     </div>
-
                     <div class="recipe-content-row">
                         <div class="ingredients-box">
                             <h3 class="ingredients-title">Ингредиенты:</h3>
@@ -83,9 +109,7 @@ if ($r) {
                             </div>
                         </div>
                     </div>
-
                     <div class="recipe-section-header"><p>РЕЦЕПТ</p></div>
-
                     <div class="recipe-steps">
                         <?php
                         $steps = explode("\n", $tut);
@@ -94,12 +118,21 @@ if ($r) {
                         foreach ($steps as $step):
                             $step = trim($step);
                             if (empty($step)) continue;
+                            $stepImg = '';
+                            if ($stepIndex < $stepCount) {
+                                $stepQ = "SELECT image_data, image_type FROM step_images WHERE recipe_id = $recipe_id AND step_number = $stepIndex";
+                                $stepRes = mysqli_query($conn, $stepQ);
+                                if ($stepRes && mysqli_num_rows($stepRes) > 0) {
+                                    $stepRow = mysqli_fetch_array($stepRes);
+                                    $stepImg = 'data:' . $stepRow['image_type'] . ';base64,' . base64_encode($stepRow['image_data']);
+                                }
+                            }
                         ?>
                             <div class="step-item">
                                 <p class="step-text"><?php echo $step; ?></p>
-                                <?php if ($stepIndex < $stepCount): ?>
+                                <?php if (!empty($stepImg)): ?>
                                     <div class="step-image">
-                                        <img src="step_image.php?id=<?php echo $recipe_id; ?>&step=<?php echo $stepIndex; ?>" alt="Шаг <?php echo $n; ?>">
+                                        <img src="<?php echo $stepImg; ?>" alt="Шаг <?php echo $n; ?>">
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -118,7 +151,6 @@ if ($r) {
             <?php endif; ?>
         </div>
     </main>
-
     <my-footer></my-footer>
 
     <script>
@@ -133,7 +165,7 @@ if ($r) {
         if (!logged) {
             heart.src = '../images/ui/heart-empty.png';
         } else {
-            fetch('../handlers/check_like.php?recipe_id=' + rid)
+            fetch('recipe_card.php?check_like=' + rid)
                 .then(r => r.json())
                 .then(d => {
                     if (d.liked) {
@@ -142,7 +174,6 @@ if ($r) {
                     }
                 });
         }
-
         btn.addEventListener('click', function() {
             if (!logged) {
                 const toast = document.createElement('div');
@@ -155,8 +186,7 @@ if ($r) {
             const liked = btn.dataset.liked === 'true';
             const action = liked ? 'unlike' : 'like';
             let cur = parseInt(count.textContent);
-
-            fetch('../handlers/toggle_like.php', {
+            fetch('recipe_card.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'recipe_id=' + rid + '&action=' + action

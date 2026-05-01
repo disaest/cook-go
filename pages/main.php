@@ -12,23 +12,23 @@ $userLogin = getUserLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная</title>
-    <link rel="stylesheet" href="../components/style.css">
+    <link rel="stylesheet" href="../components/styles/base.css">
+    <link rel="stylesheet" href="../components/styles/main.css">
+    <link rel="stylesheet" href="../components/styles/recipes.css">
     <script src="../components/header.js" defer></script>
     <script src="../components/footer.js" defer></script>
 </head>
 <body data-logged-in="<?php echo $isLoggedIn ? 'true' : 'false'; ?>" data-user-login="<?php echo safe($userLogin); ?>">
     <my-header title="главное окно" link-text="категории" link-url="categories.php"></my-header>
-
     <main>
         <div class="welcome-image">
-            <img src="../images/ui/welcome-text.png" alt="welcome-text">
+            <img src="../images/ui/welcome-text.png" alt="COOK GO!">
         </div>
-
         <?php if ($isLoggedIn): ?>
             <div class="favorites-section">
                 <div class="favorites-header"><p>ВАМ ПОНРАВИЛОСЬ</p></div>
                 <?php
-                $q = "SELECT r.id, r.title, r.icon, r.description, r.likes, c.title as cat_title, c.id as cat_id
+                $q = "SELECT r.id, r.title, r.image_data, r.image_type, r.description, r.likes, c.title as cat_title, c.id as cat_id
                       FROM user_likes ul
                       JOIN recipes r ON ul.recipe_id = r.id
                       JOIN categories c ON r.category_id = c.id
@@ -40,15 +40,18 @@ $userLogin = getUserLogin();
                     while ($row = mysqli_fetch_array($res)) {
                         $id = $row['id'];
                         $title = safe($row['title']);
-                        $icon = safe($row['icon']);
                         $desc = safe($row['description']);
                         $likes = $row['likes'];
                         $catTitle = safe($row['cat_title']);
                         $catId = $row['cat_id'];
                         $catEnc = urlencode($catTitle);
+                        $imgSrc = '';
+                        if (!empty($row['image_data'])) {
+                            $imgSrc = 'data:' . $row['image_type'] . ';base64,' . base64_encode($row['image_data']);
+                        }
                         echo "
                         <a href='recipe_card.php?recipe_id=$id&category_id=$catId&category_title=$catEnc' class='recipe-card'>
-                            <div class='recipe-image'><img src='pages/image.php?id=$id' alt='$title'></div>
+                            <div class='recipe-image'><img src='$imgSrc' alt='$title'></div>
                             <div class='recipe-info'>
                                 <div class='recipe-text'>
                                     <h2 class='recipe-title'>$title</h2>
@@ -75,7 +78,6 @@ $userLogin = getUserLogin();
             </div>
         <?php endif; ?>
     </main>
-
     <my-footer></my-footer>
 </body>
 </html>

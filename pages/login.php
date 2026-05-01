@@ -35,13 +35,13 @@ $userLogin = getUserLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход</title>
-    <link rel="stylesheet" href="../components/style.css">
+    <link rel="stylesheet" href="../components/styles/base.css">
+    <link rel="stylesheet" href="../components/styles/forms.css">
     <script src="../components/header.js" defer></script>
     <script src="../components/footer.js" defer></script>
 </head>
 <body class="login-page" data-logged-in="<?php echo $isLoggedIn ? 'true' : 'false'; ?>" data-user-login="<?php echo safe($userLogin); ?>">
     <my-header title="вход" link-text="главное окно" link-url="main.php"></my-header>
-
     <main>
         <div class="form-wrapper">
             <div class="form-header"><p>Вход</p></div>
@@ -54,7 +54,7 @@ $userLogin = getUserLogin();
                 <?php endif; ?>
                 <?php if ($isLoggedIn): ?>
                     <div class="already-logged-message">Вы уже вошли как <strong><?php echo safe($userLogin); ?></strong></div>
-                    <div class="logout-link"><a href="#" id="logout-link">Хотите выйти?</a></div>
+                    <div class="logout-link"><a href="../logout.php">Хотите выйти?</a></div>
                 <?php else: ?>
                     <?php if ($error): ?><div class="error-message"><?php echo safe($error); ?></div><?php endif; ?>
                     <form method="POST">
@@ -73,13 +73,6 @@ $userLogin = getUserLogin();
             </div>
         </div>
     </main>
-
     <my-footer></my-footer>
-    <script>
-    document.getElementById('logout-link')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.location.href = '../logout.php';
-    });
-    </script>
 </body>
 </html>

@@ -5,7 +5,6 @@ class MyHeader extends HTMLElement {
         const linkUrl = this.getAttribute('link-url') || '';
         const isLoggedIn = document.body.dataset.loggedIn === 'true';
         const userLogin = document.body.dataset.userLogin || '';
-
         let authHtml = '';
         if (!isLoggedIn) {
             authHtml = `
@@ -25,13 +24,12 @@ class MyHeader extends HTMLElement {
                     </a>
                 </div>`;
         }
-
         this.innerHTML = `
             <header class="header">
                 <div class="header-wrapper">
                     <div class="header-left">
                         <div class="logo-img">
-                            <img src="../images/ui/logo.png" alt="logo">
+                            <a href="main.php"><img src="../images/ui/logo.png" alt="logo"></a>
                         </div>
                         <div class="up-title">
                             ${linkUrl ? `<a href="${linkUrl}"><p>${linkText}</p></a>` : `<p>${title}</p>`}
@@ -40,7 +38,6 @@ class MyHeader extends HTMLElement {
                     ${authHtml}
                 </div>
             </header>`;
-
         if (isLoggedIn) {
             const btn = this.querySelector('#logout-btn');
             if (btn) {
@@ -56,7 +53,6 @@ class MyHeader extends HTMLElement {
 function showLogoutConfirm(login) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-
     const modal = document.createElement('div');
     modal.className = 'logout-modal';
     modal.innerHTML = `
@@ -67,7 +63,6 @@ function showLogoutConfirm(login) {
                 <button class="modal-btn modal-btn-no">Отмена</button>
             </div>
         </div>`;
-
     document.body.appendChild(overlay);
     document.body.appendChild(modal);
 
@@ -83,5 +78,4 @@ function showLogoutConfirm(login) {
         modal.remove();
     };
 }
-
 customElements.define('my-header', MyHeader);

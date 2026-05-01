@@ -1,0 +1,128 @@
+/*FORMS*/
+.form-wrapper {
+    width: 800px;
+    margin: 60px auto;
+}
+
+.form-header {
+    background: var(--orange);
+    padding: 10px 30px;
+    text-align: left;
+}
+
+.form-header p {
+    color: var(--white);
+    font-size: 28px;
+    font-family: "MPlus";
+    margin: 0;
+}
+
+.form-container {
+    padding: 40px;
+    background: #D9D9D9;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--black);
+    font-size: 18px;
+    font-family: "MPlus";
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 16px;
+    color: var(--black);
+    background: var(--white);
+    border: none;
+    border-radius: 0;
+    outline: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    font-family: "MPlus";
+}
+
+.form-group input::placeholder {
+    color: #888;
+}
+
+.form-group:last-of-type {
+    margin-bottom: 45px;
+}
+
+.submit-btn {
+    width: 300px;
+    padding: 10px;
+    background: var(--orange);
+    color: var(--white);
+    font-size: 20px;
+    font-family: "MPlus";
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.submit-btn:hover {
+    background: #d44e1a;
+}
+
+.form-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-link a {
+    color: var(--gray);
+    font-size: 16px;
+    font-family: "MPlus";
+    text-decoration: none;
+}
+
+.form-link a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background: rgba(255, 200, 200, 0.9);
+    color: #c00;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-family: "MPlus";
+    text-align: center;
+}
+
+.success-message,
+.already-logged-message {
+    background: var(--white);
+    color: var(--black);
+    padding: 20px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-family: "MPlus";
+    text-align: center;
+}
+
+.logout-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.logout-link a {
+    color: var(--black);
+    font-size: 16px;
+    font-family: "MPlus";
+    text-decoration: none;
+    border-bottom: 1px dashed #888;
+}
+
+.logout-link a:hover {
+    color: var(--orange);
+}

@@ -1,9 +1,9 @@
 <?php
 session_start();
 require_once '../components/connect.php';
+
 $isLoggedIn = isLoggedIn();
 $userLogin = getUserLogin();
-
 $search = trim($_GET['search'] ?? '');
 ?>
 <!DOCTYPE html>
@@ -12,13 +12,13 @@ $search = trim($_GET['search'] ?? '');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Категории</title>
-    <link rel="stylesheet" href="../components/style.css">
+    <link rel="stylesheet" href="../components/styles/base.css">
+    <link rel="stylesheet" href="../components/styles/categories.css">
     <script src="../components/header.js" defer></script>
     <script src="../components/footer.js" defer></script>
 </head>
 <body data-logged-in="<?php echo $isLoggedIn ? 'true' : 'false'; ?>" data-user-login="<?php echo safe($userLogin); ?>">
     <my-header title="категории" link-text="главное окно" link-url="main.php"></my-header>
-
     <main>
         <div class="categories-container">
             <div class="search-wrapper">
@@ -30,10 +30,9 @@ $search = trim($_GET['search'] ?? '');
                     <?php endif; ?>
                 </form>
             </div>
-
             <div class="categories-grid">
                 <?php
-                $q = "SELECT id, title FROM categories";
+                $q = "SELECT id, title, image_data, image_type FROM categories";
                 if (!empty($search)) {
                     $esc = mysqli_real_escape_string($conn, $search);
                     $q .= " WHERE title LIKE '%$esc%'";
@@ -41,15 +40,18 @@ $search = trim($_GET['search'] ?? '');
                 $q .= " ORDER BY id ASC";
                 $res = mysqli_query($conn, $q);
                 $count = mysqli_num_rows($res);
-
                 if ($count > 0) {
                     while ($cat = mysqli_fetch_array($res)) {
                         $id = $cat['id'];
                         $title = safe($cat['title']);
+                        $imgSrc = '';
+                        if (!empty($cat['image_data'])) {
+                            $imgSrc = 'data:' . $cat['image_type'] . ';base64,' . base64_encode($cat['image_data']);
+                        }
                         echo "
                         <a href='recipes.php?category_id=$id' class='category-card'>
                             <div class='category-title'><p>$title</p></div>
-                            <div class='category-image'><img src='category_image.php?id=$id' alt='$title'></div>
+                            <div class='category-image'><img src='$imgSrc' alt='$title'></div>
                         </a>";
                     }
                 } else {
@@ -61,7 +63,6 @@ $search = trim($_GET['search'] ?? '');
             </div>
         </div>
     </main>
-
     <my-footer></my-footer>
 </body>
 </html>

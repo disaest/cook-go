@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login = trim($_POST['login'] ?? '');
     $pass = $_POST['password'] ?? '';
     $pass2 = $_POST['password_confirm'] ?? '';
-
     if (empty($login)) $error = 'Введите логин';
     elseif (strlen($login) < 3) $error = 'Логин не менее 3 символов';
     elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $login)) $error = 'Только латиница, цифры и _';
@@ -41,13 +40,13 @@ $userLogin = getUserLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <link rel="stylesheet" href="../components/style.css">
+    <link rel="stylesheet" href="../components/styles/base.css">
+    <link rel="stylesheet" href="../components/styles/forms.css">
     <script src="../components/header.js" defer></script>
     <script src="../components/footer.js" defer></script>
 </head>
 <body class="register-page" data-logged-in="<?php echo $isLoggedIn ? 'true' : 'false'; ?>" data-user-login="<?php echo safe($userLogin); ?>">
     <my-header title="регистрация" link-text="главное окно" link-url="main.php"></my-header>
-
     <main>
         <div class="form-wrapper">
             <div class="form-header"><p>Регистрация</p></div>
@@ -72,7 +71,6 @@ $userLogin = getUserLogin();
             </div>
         </div>
     </main>
-
     <my-footer></my-footer>
 </body>
 </html>
