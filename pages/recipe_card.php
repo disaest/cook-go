@@ -5,10 +5,10 @@ require_once '../components/connect.php';
 $isLoggedIn = isLoggedIn();
 $userLogin = getUserLogin();
 $userId = $_SESSION['user_id'] ?? 0;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $rid = (int)($_POST['recipe_id'] ?? 0);
     $action = $_POST['action'] ?? '';
-    
     if ($userId && $rid) {
         if ($action === 'like') {
             mysqli_query($conn, "INSERT IGNORE INTO user_likes (user_id, recipe_id) VALUES ($userId, $rid)");
@@ -37,6 +37,33 @@ $recipe_id = $_GET['recipe_id'] ?? 0;
 $category_id = $_GET['category_id'] ?? 0;
 $catTitle = safe(urldecode($_GET['category_title'] ?? 'категория'));
 
+$q = "SELECT * FROM recipes WHERE id = $recipe_id";
+$res = mysqli_query($conn, $q);
+$r = mysqli_fetch_array($res);
+
+if ($r) {
+    $title = safe($r['title']);
+    $desc = safe($r['description']);
+    $likes = $r['likes'];
+    $ingr = safe($r['ingridients'] ?? 'Не указано');
+    $port = safe($r['portions'] ?? 'Не указано');
+    $time = safe($r['time_for_cook'] ?? 'Не указано');
+    $tut = safe($r['tutorial'] ?? '');
+    $mainImg = '';
+    if (!empty($r['image_data'])) {
+        $mainImg = 'data:' . $r['image_type'] . ';base64,' . base64_encode($r['image_data']);
+    }
+    $stepCountRes = mysqli_query($conn, "SELECT COUNT(*) as cnt FROM step_images WHERE recipe_id = $recipe_id");
+    $stepCountRow = mysqli_fetch_array($stepCountRes);
+    $stepCount = $stepCountRow['cnt'] ?? 0;
+} else {
+    $title = 'Рецепт не найден';
+    $desc = $ingr = $port = $time = $tut = '';
+    $likes = 0;
+    $mainImg = '';
+    $stepCount = 0;
+}
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -128,7 +155,6 @@ $catTitle = safe(urldecode($_GET['category_title'] ?? 'категория'));
         </div>
     </main>
     <my-footer></my-footer>
-
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const btn = document.getElementById('like-btn');
@@ -137,7 +163,6 @@ $catTitle = safe(urldecode($_GET['category_title'] ?? 'категория'));
         const count = document.getElementById('likes-count');
         const rid = btn.dataset.recipeId;
         const logged = document.body.dataset.loggedIn === 'true';
-
         if (!logged) {
             heart.src = '../images/ui/heart-empty.png';
         } else {
