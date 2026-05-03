@@ -50,7 +50,7 @@
 
 .recipe-description-full {
     color: var(--gray);
-    font-size: 19px;
+    font-size: 20px;
     font-family: "MPlus";
     line-height: 1.6;
     margin: 0;
@@ -99,7 +99,7 @@
 
 .ingredients-list {
     color: var(--gray);
-    font-size: 16px;
+    font-size: 20px;
     font-family: "MPlus";
     line-height: 1.5;
     white-space: pre-line;
@@ -116,7 +116,7 @@
 
 .meta-label {
     color: var(--gray);
-    font-size: 16px;
+    font-size: 20px;
     font-family: "MPlus";
     margin: 0 0 6px 0;
 }
@@ -170,7 +170,7 @@
 
 .step-text {
     color: var(--gray);
-    font-size: 18px;
+    font-size: 24px;
     font-family: "MPlus";
     line-height: 1.7;
     white-space: pre-line;
